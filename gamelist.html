@@ -107,15 +107,6 @@
             text-align: center;
         }
 
-        .now-playing {
-            margin: 0;
-            min-height: 1.2em;
-            text-align: center;
-            color: white;
-            font-family: "Arial Narrow", Arial, sans-serif;
-            font-size: 16px;
-        }
-
         .music-controls {
             display: flex;
             justify-content: center;
@@ -188,8 +179,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             column-gap: 24px;
-            width: 604px;
-            margin: 12px auto 20px;
+            width: 800px;
+            margin: 24px auto 20px;
             padding: 0;
             text-align: left;
         }
@@ -202,12 +193,12 @@
             padding: 6px 8px;
             border-bottom: 1px solid #3d3424;
             font-family: "Arial Narrow", Arial, sans-serif;
-            font-size: 18px;
+            font-size: 26px;
         }
 
         .game-downloads img {
-            width: 17px;
-            height: 15px;
+            width: 30px;
+            height: 30px;
             flex-shrink: 0;
         }
 
@@ -239,13 +230,11 @@
     <br>
 
     <div class="music-player">
-        <h2>Music</h2>
-        <p class="now-playing" id="now-playing">Loading music…</p>
-        <div class="music-controls">
+        <div class="music-controls" style="display: inline-block">
             <button type="button" id="music-start"><img src="/images/play.png" style="width: 50px" /></button>
             <button type=" button" id="music-stop"><img src="/images/stop.png" style="width: 50px" /></button>
         </div>
-        <ul class="track-list" id="track-list"></ul>
+        <ul class="track-list" id="track-list" style="display: inline-block"></ul>
     </div>
 
     <!--Page nav end-->
@@ -317,70 +306,6 @@
     <div align="center">
         <table>
             <td class="title" align="center">
-                <h2>Real Time Strategy</h2>
-            </td>
-        </table>
-    </div>
-
-    <p class="top" align="center"><img src="images/dframetop.gif"></p>
-
-    <div class="container">
-        <table class="game">
-            <img src="images/dframetopleft.gif" height="190px" width="35px">
-            <td class="game"><img src="images/boxstarcraft.gif" width="100px"></td>
-            <td width="120px" class="info">
-                <h4>Starcraft</h4>
-                <div>Year: 1999</div>
-                <div>Players: 16</div>
-                <div>Genre: RTS</div>
-                <div>&nbsp;</div>
-            </td>
-        </table>
-        <table class="game">
-            <td class="game"><img src="images/boxwiii.gif" width="100px"></td>
-            <td width="120px" class="info">
-                <h4>Warcraft</h4>
-                <div>Year: 2002</div>
-                <div>Players: 16</div>
-                <div>Genre: FPS</div>
-                <div>&nbsp;</div>
-            </td>
-        </table>
-        <img src="images/dframetopright.gif" height="190px" width="35px">
-
-    </div>
-    <div class="container">
-        <table class="game">
-            <img src="images/dframebottomleft.gif" height="190px" width="35px">
-            <td class="game"><img src="images/boxraii.gif" width="100px"></td>
-            <td width="120px" class="info">
-                <h4>C&C</h4>
-                <div>Year: 2000</div>
-                <div>Players: 16</div>
-                <div>Genre: FPS</div>
-                <div>&nbsp;</div>
-            </td>
-        </table>
-        <table class="game">
-            <td class="game"><img src="images/boxaoeii.gif" width="100px"></td>
-            <td width="120px" class="info">
-                <h4>Age of Empires</h4>
-                <div>Year: 1999</div>
-                <div>Players: 16</div>
-                <div>Genre: FPS</div>
-                <div>&nbsp;</div>
-            </td>
-        </table>
-        <img src="images/dframebottomright.gif" height="190px" width="35px">
-    </div>
-
-    <p class="top" align="center"><img src="images/dframebottom.gif" width="604px"></p>
-
-    <br><br>
-
-    <div align="center">
-        <table>
-            <td class="title" align="center">
                 <h2>Downloads</h2>
             </td>
         </table>
@@ -414,7 +339,6 @@
                 audio.preload = "auto";
                 audio.volume = 0.85;
 
-                var nowPlaying = document.getElementById("now-playing");
                 var listEl = document.getElementById("track-list");
                 var startBtn = document.getElementById("music-start");
                 var stopBtn = document.getElementById("music-stop");
@@ -432,7 +356,6 @@
                 }
 
                 function setStatus(text) {
-                    nowPlaying.textContent = text;
                 }
 
                 function renderList() {
@@ -528,7 +451,6 @@
                     playing = true;
                     highlight();
                     var track = tracks[index];
-                    setStatus("Now playing: " + track.title);
 
                     if (track.kind === "mp3") {
                         audio.src = track.src;
@@ -726,7 +648,7 @@
                 href = href.split("#")[0].split("?")[0];
                 try {
                     href = decodeURIComponent(href);
-                } catch (e) {}
+                } catch (e) { }
                 if (/^(https?:)?\/\//i.test(href) || href.indexOf("..") !== -1) return null;
                 var parts = href.split("/").filter(Boolean);
                 var name = parts[parts.length - 1];
@@ -771,8 +693,8 @@
                     var img = document.createElement("img");
                     img.src = "/images/skull.gif";
                     img.alt = "";
-                    img.width = 17;
-                    img.height = 15;
+                    img.width = 30;
+                    img.height = 30;
                     var link = document.createElement("a");
                     link.href = "/games/" + encodeURIComponent(game.name);
                     link.setAttribute("download", game.name);
