@@ -2,6 +2,14 @@
 
 This is a sick html page of LAN games at SkullSpace.
 
+Visit it here: https://lan-drive.nitrodist.workers.dev/
+
+Host it yourself at your next LAN party and/or the next Skullspace LAN party.
+
+## How to deploy
+
+You will (probably, most likely) want to host this project with a webserver so that people can access it from your machine (or the Internet - we have hosted it at https://lan-drive.nitrodist.workers.dev/)
+
 ## To add more music
 
 Add a new file to the `music/` directory. It can be a mp3 or midi file. Other files are probably supported, any your browser plays.
