@@ -1,10 +1,7 @@
 (function () {
   var nextId = 0;
   var widgets = [];
-  var probe = document.createElement("span");
-  probe.className = "win98-select-value";
-  probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;";
-  document.body.appendChild(probe);
+  var probe;
 
   function labelText(select) {
     if (select.getAttribute("aria-label")) return select.getAttribute("aria-label");
@@ -316,12 +313,25 @@
     Array.prototype.forEach.call(root.querySelectorAll("select"), enhanceSelect);
   }
 
-  scan(document);
-  new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-      Array.prototype.forEach.call(mutation.addedNodes, function (node) {
-        scan(node);
+  function boot() {
+    probe = document.createElement("span");
+    probe.className = "win98-select-value";
+    probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;";
+    document.body.appendChild(probe);
+
+    scan(document);
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        Array.prototype.forEach.call(mutation.addedNodes, function (node) {
+          scan(node);
+        });
       });
-    });
-  }).observe(document.body, { childList: true, subtree: true });
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
 })();
