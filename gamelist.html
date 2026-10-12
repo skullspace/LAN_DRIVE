@@ -182,6 +182,40 @@
             flex-shrink: 0;
             margin-left: 12px;
         }
+
+        .game-downloads {
+            list-style: none;
+            width: 520px;
+            margin: 12px auto 20px;
+            padding: 0;
+            text-align: left;
+        }
+
+        .game-downloads li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 8px;
+            border-bottom: 1px solid #3d3424;
+            font-family: "Arial Narrow", Arial, sans-serif;
+            font-size: 18px;
+        }
+
+        .game-downloads img {
+            width: 17px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+
+        .game-downloads a {
+            flex: 1;
+            color: rgb(197, 138, 51);
+        }
+
+        .game-size {
+            color: white;
+            flex-shrink: 0;
+        }
     </style>
 
 </head>
@@ -337,6 +371,17 @@
     </div>
 
     <p class="top" align="center"><img src="images/dframebottom.gif" width="604px"></p>
+
+    <br><br>
+
+    <div align="center">
+        <table>
+            <td class="title" align="center">
+                <h2>Downloads</h2>
+            </td>
+        </table>
+    </div>
+    <ul class="game-downloads" id="game-downloads"></ul>
 
     <br><br>
     <div align=center>
@@ -615,6 +660,151 @@
                     startTrack(randomIndex(-1));
                 });
             })();
+    </script>
+    <script>
+        (function () {
+            var FALLBACK_GAMES = [
+                "ageofempiresii.zip",
+                "armegatronadvanced.zip",
+                "counterstrike.zip",
+                "ddrace.zip",
+                "starcraftbroodwar.zip",
+                "unrealtournament.zip",
+                "worms.zip"
+            ];
+
+            var listEl = document.getElementById("game-downloads");
+
+            function titleFromName(name) {
+                var base = name.replace(/\.zip$/i, "");
+                var spaced = base.replace(/_+/g, " ").replace(/-+/g, " ").replace(/\s+/g, " ").trim();
+                return spaced.replace(/\b\w/g, function (ch) {
+                    return ch.toUpperCase();
+                });
+            }
+
+            function formatSize(bytes) {
+                if (bytes < 1024) return bytes + " B";
+                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+                if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+                return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
+            }
+
+            function sizeFromHeaders(headers) {
+                var len = headers.get("Content-Length");
+                if (len && /^\d+$/.test(len)) return Number(len);
+                var range = headers.get("Content-Range") || "";
+                var match = /\/(\d+)\s*$/.exec(range);
+                return match ? Number(match[1]) : null;
+            }
+
+            function cancelBody(res) {
+                if (res.body && res.body.cancel) res.body.cancel();
+            }
+
+            function probeSize(name) {
+                var url = "/games/" + encodeURIComponent(name);
+                return fetch(url, { method: "HEAD" }).then(function (res) {
+                    if (!res.ok) return { missing: true };
+                    var size = sizeFromHeaders(res.headers);
+                    if (size != null) return { size: size };
+                    return fetch(url, { headers: { Range: "bytes=0-0" } }).then(function (ranged) {
+                        var rangedSize = ranged.status === 206 ? sizeFromHeaders(ranged.headers) : null;
+                        cancelBody(ranged);
+                        return { size: rangedSize };
+                    });
+                }).catch(function () {
+                    return { missing: true };
+                });
+            }
+
+            function zipNameFromHref(href) {
+                href = href.split("#")[0].split("?")[0];
+                try {
+                    href = decodeURIComponent(href);
+                } catch (e) {}
+                if (/^(https?:)?\/\//i.test(href) || href.indexOf("..") !== -1) return null;
+                var parts = href.split("/").filter(Boolean);
+                var name = parts[parts.length - 1];
+                if (!name || !/\.zip$/i.test(name)) return null;
+                return name;
+            }
+
+            function discoverGames() {
+                return fetch("/games/").then(function (res) {
+                    if (!res.ok) return null;
+                    var type = res.headers.get("content-type") || "";
+                    if (type.indexOf("html") === -1 && type.indexOf("text") === -1 && type !== "") return null;
+                    return res.text();
+                }).then(function (html) {
+                    if (!html) return null;
+                    var found = [];
+                    var seen = {};
+                    var re = /href\s*=\s*["']([^"']+)["']/gi;
+                    var match;
+                    while ((match = re.exec(html))) {
+                        var name = zipNameFromHref(match[1]);
+                        if (!name || seen[name]) continue;
+                        seen[name] = true;
+                        found.push(name);
+                    }
+                    return found.length ? found : null;
+                }).catch(function () {
+                    return null;
+                });
+            }
+
+            function renderGames(games) {
+                listEl.innerHTML = "";
+                if (!games.length) {
+                    var empty = document.createElement("li");
+                    empty.textContent = "No games found.";
+                    listEl.appendChild(empty);
+                    return;
+                }
+                games.forEach(function (game) {
+                    var li = document.createElement("li");
+                    var img = document.createElement("img");
+                    img.src = "/images/skull.gif";
+                    img.alt = "";
+                    img.width = 17;
+                    img.height = 15;
+                    var link = document.createElement("a");
+                    link.href = "/games/" + encodeURIComponent(game.name);
+                    link.setAttribute("download", game.name);
+                    link.textContent = game.title;
+                    var size = document.createElement("span");
+                    size.className = "game-size";
+                    size.textContent = game.size == null ? "Size unknown" : formatSize(game.size);
+                    li.appendChild(img);
+                    li.appendChild(link);
+                    li.appendChild(size);
+                    listEl.appendChild(li);
+                });
+            }
+
+            discoverGames().then(function (found) {
+                var names = found || FALLBACK_GAMES.slice();
+                return Promise.all(names.map(function (name) {
+                    return probeSize(name).then(function (probe) {
+                        if (probe.missing) return null;
+                        return {
+                            name: name,
+                            title: titleFromName(name),
+                            size: probe.size
+                        };
+                    });
+                }));
+            }).then(function (games) {
+                games = games.filter(Boolean);
+                games.sort(function (a, b) {
+                    return a.title.localeCompare(b.title);
+                });
+                renderGames(games);
+            }).catch(function () {
+                renderGames([]);
+            });
+        })();
     </script>
 
 </body>
