@@ -1,0 +1,13 @@
+{
+  "name": "lan-drive",
+  "compatibility_date": "2026-10-12",
+  "main": "worker/index.js",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  },
+  "build": {
+    "command": "node scripts/catalog.mjs",
+    "watch_dir": ["music", "games"]
+  }
+}
