@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Windows 98 dropdown</title>
+  <style>
+    body {
+      margin: 24px;
+      background: #c0c0c0;
+      color: #000;
+      font-family: Tahoma, "Microsoft Sans Serif", "MS Sans Serif", Arial, sans-serif;
+      font-size: 11px;
+    }
+
+    /* Native control stays in the document for the value, but the OS menu cannot be skinned. */
+    select.win98-native {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
+      border: 0;
+      white-space: nowrap;
+    }
+
+    .win98-select {
+      position: relative;
+      display: inline-block;
+      vertical-align: middle;
+      font-family: Tahoma, "Microsoft Sans Serif", "MS Sans Serif", Arial, sans-serif;
+      font-size: 11px;
+      color: #000;
+      -webkit-font-smoothing: none;
+      user-select: none;
+      cursor: default;
+    }
+
+    .win98-select:focus {
+      outline: none;
+    }
+
+    .win98-select:focus-visible .win98-select-box {
+      outline: 1px dotted #000;
+      outline-offset: 2px;
+    }
+
+    .win98-select-box {
+      display: flex;
+      align-items: stretch;
+      box-sizing: border-box;
+      height: 21px;
+      padding: 2px;
+      background: #fff;
+      box-shadow:
+        inset -1px -1px #fff,
+        inset 1px 1px #808080,
+        inset -2px -2px #dfdfdf,
+        inset 2px 2px #000;
+    }
+
+    .win98-select-value {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      min-width: 72px;
+      padding: 0 4px;
+      line-height: 15px;
+      white-space: nowrap;
+    }
+
+    .win98-select-button {
+      flex: 0 0 16px;
+      width: 16px;
+      margin-left: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #c0c0c0;
+      box-shadow:
+        inset -1px -1px #0a0a0a,
+        inset 1px 1px #fff,
+        inset -2px -2px #808080,
+        inset 2px 2px #dfdfdf;
+    }
+
+    .win98-select.is-open .win98-select-button,
+    .win98-select-button:active {
+      box-shadow:
+        inset -1px -1px #fff,
+        inset 1px 1px #0a0a0a,
+        inset -2px -2px #dfdfdf,
+        inset 2px 2px #808080;
+    }
+
+    .win98-select-arrow {
+      width: 7px;
+      height: 4px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' shape-rendering='crispEdges'%3E%3Crect width='7' height='1' fill='%23000'/%3E%3Crect x='1' y='1' width='5' height='1' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='1' fill='%23000'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23000'/%3E%3C/svg%3E") center / 7px 4px no-repeat;
+    }
+
+    .win98-select.is-open .win98-select-arrow,
+    .win98-select-button:active .win98-select-arrow {
+      transform: translate(1px, 1px);
+    }
+
+    .win98-select-list {
+      display: none;
+      position: absolute;
+      z-index: 1;
+      left: 0;
+      top: calc(100% + 1px);
+      box-sizing: border-box;
+      width: 100%;
+      margin: 0;
+      padding: 2px;
+      list-style: none;
+      background: #fff;
+      box-shadow:
+        inset -1px -1px #fff,
+        inset 1px 1px #808080,
+        inset -2px -2px #dfdfdf,
+        inset 2px 2px #000;
+    }
+
+    .win98-select.is-open .win98-select-list {
+      display: block;
+    }
+
+    .win98-select-option {
+      padding: 1px 4px 2px;
+      line-height: 15px;
+      white-space: nowrap;
+    }
+
+    .win98-select-option.is-active {
+      background: #000080;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <select name="cars" id="cars">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="opel">Opel</option>
+    <option value="audi">Audi</option>
+  </select>
+  <script>
+    (function () {
+      var select = document.getElementById("cars");
+      if (!select) return;
+
+      select.className = "win98-native";
+      select.tabIndex = -1;
+      select.setAttribute("aria-hidden", "true");
+
+      var widget = document.createElement("div");
+      widget.className = "win98-select";
+      widget.tabIndex = 0;
+      widget.setAttribute("role", "combobox");
+      widget.setAttribute("aria-haspopup", "listbox");
+      widget.setAttribute("aria-expanded", "false");
+      widget.setAttribute("aria-label", select.getAttribute("name") || "Select");
+
+      var box = document.createElement("div");
+      box.className = "win98-select-box";
+
+      var valueEl = document.createElement("span");
+      valueEl.className = "win98-select-value";
+
+      var button = document.createElement("span");
+      button.className = "win98-select-button";
+      button.setAttribute("aria-hidden", "true");
+
+      var arrow = document.createElement("span");
+      arrow.className = "win98-select-arrow";
+      button.appendChild(arrow);
+      box.appendChild(valueEl);
+      box.appendChild(button);
+
+      var list = document.createElement("ul");
+      list.className = "win98-select-list";
+      list.id = (select.id || "select") + "-listbox";
+      list.setAttribute("role", "listbox");
+      list.setAttribute("aria-hidden", "true");
+      widget.setAttribute("aria-controls", list.id);
+
+      var options = Array.prototype.slice.call(select.options);
+      var items = options.map(function (option, index) {
+        var item = document.createElement("li");
+        item.className = "win98-select-option";
+        item.id = (select.id || "select") + "-option-" + index;
+        item.setAttribute("role", "option");
+        item.setAttribute("aria-selected", "false");
+        item.textContent = option.text;
+        list.appendChild(item);
+        return item;
+      });
+
+      widget.appendChild(box);
+      widget.appendChild(list);
+      select.insertAdjacentElement("afterend", widget);
+
+      var active = select.selectedIndex > -1 ? select.selectedIndex : 0;
+
+      function renderValue() {
+        var option = options[select.selectedIndex] || options[0];
+        valueEl.textContent = option ? option.text : "";
+        items.forEach(function (item, index) {
+          item.setAttribute("aria-selected", index === select.selectedIndex ? "true" : "false");
+        });
+      }
+
+      function setActive(index) {
+        if (!items.length) return;
+        active = Math.max(0, Math.min(items.length - 1, index));
+        items.forEach(function (item, itemIndex) {
+          item.classList.toggle("is-active", itemIndex === active);
+        });
+        if (widget.classList.contains("is-open")) {
+          widget.setAttribute("aria-activedescendant", items[active].id);
+        }
+      }
+
+      function commit(index) {
+        if (!options[index]) return;
+        var changed = select.selectedIndex !== index;
+        select.selectedIndex = index;
+        renderValue();
+        if (changed) {
+          select.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      }
+
+      function openList() {
+        if (widget.classList.contains("is-open")) return;
+        widget.classList.add("is-open");
+        widget.setAttribute("aria-expanded", "true");
+        list.removeAttribute("aria-hidden");
+        setActive(select.selectedIndex > -1 ? select.selectedIndex : 0);
+      }
+
+      function closeList() {
+        if (!widget.classList.contains("is-open")) return;
+        widget.classList.remove("is-open");
+        widget.setAttribute("aria-expanded", "false");
+        widget.removeAttribute("aria-activedescendant");
+        list.setAttribute("aria-hidden", "true");
+        items.forEach(function (item) {
+          item.classList.remove("is-active");
+        });
+      }
+
+      widget.addEventListener("mousedown", function (event) {
+        if (list.contains(event.target)) {
+          event.preventDefault();
+          return;
+        }
+        event.preventDefault();
+        widget.focus();
+        if (widget.classList.contains("is-open")) closeList();
+        else openList();
+      });
+
+      items.forEach(function (item, index) {
+        item.addEventListener("mouseenter", function () {
+          setActive(index);
+        });
+        item.addEventListener("click", function () {
+          commit(index);
+          closeList();
+          widget.focus();
+        });
+      });
+
+      widget.addEventListener("keydown", function (event) {
+        var key = event.key;
+        var open = widget.classList.contains("is-open");
+
+        if (key === "ArrowDown" || key === "ArrowUp") {
+          event.preventDefault();
+          if (event.altKey) {
+            if (key === "ArrowDown") openList();
+            else {
+              commit(active);
+              closeList();
+            }
+            return;
+          }
+          var delta = key === "ArrowDown" ? 1 : -1;
+          if (!open) {
+            commit(Math.max(0, Math.min(options.length - 1, select.selectedIndex + delta)));
+            return;
+          }
+          setActive(active + delta);
+          return;
+        }
+
+        if (key === "Enter" || key === " ") {
+          event.preventDefault();
+          if (!open) openList();
+          else {
+            commit(active);
+            closeList();
+          }
+          return;
+        }
+
+        if (key === "Escape" || key === "F4") {
+          event.preventDefault();
+          if (key === "F4" && !open) openList();
+          else closeList();
+          return;
+        }
+
+        if (key === "Home" || key === "End") {
+          event.preventDefault();
+          var edge = key === "Home" ? 0 : options.length - 1;
+          if (open) setActive(edge);
+          else commit(edge);
+          return;
+        }
+
+        if (key.length === 1 && key.trim()) {
+          var start = (open ? active : select.selectedIndex) + 1;
+          for (var step = 0; step < options.length; step += 1) {
+            var index = (start + step) % options.length;
+            if (options[index].text.toLowerCase().charAt(0) === key.toLowerCase()) {
+              if (open) setActive(index);
+              else commit(index);
+              break;
+            }
+          }
+        }
+      });
+
+      document.addEventListener("mousedown", function (event) {
+        if (!widget.contains(event.target)) closeList();
+      });
+
+      var probe = document.createElement("span");
+      probe.className = "win98-select-value";
+      probe.style.cssText = "position:absolute;left:-9999px;top:0;visibility:hidden;";
+      document.body.appendChild(probe);
+      var widest = 0;
+      options.forEach(function (option) {
+        probe.textContent = option.text;
+        widest = Math.max(widest, probe.offsetWidth);
+      });
+      probe.remove();
+      valueEl.style.minWidth = Math.max(widest, 72) + "px";
+
+      renderValue();
+    })();
+  </script>
+</body>
+</html>
