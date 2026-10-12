@@ -93,6 +93,97 @@
             margin: 0px;
             height: 35px;
         }
+
+        .music-player {
+            width: 520px;
+            margin: 8px auto 20px;
+            background-color: #111310;
+            border: 2px solid rgb(197, 138, 51);
+            padding: 8px 14px 14px;
+            box-sizing: border-box;
+        }
+
+        .music-player h2 {
+            margin: 4px 0 6px;
+            text-align: center;
+        }
+
+        .now-playing {
+            margin: 0;
+            min-height: 1.2em;
+            text-align: center;
+            color: white;
+            font-family: "Arial Narrow", Arial, sans-serif;
+            font-size: 16px;
+        }
+
+        .music-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .music-controls button,
+        .track-list button {
+            font-family: "Arial Narrow", Arial, sans-serif;
+            font-size: 16px;
+            color: rgb(197, 138, 51);
+            background: #1a1914;
+            border: 1px solid rgb(197, 138, 51);
+            cursor: pointer;
+        }
+
+        .music-controls button {
+            min-width: 88px;
+            padding: 4px 16px;
+        }
+
+        .music-controls button:hover {
+            background: rgb(197, 138, 51);
+            color: #111310;
+        }
+
+        .track-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            max-height: 180px;
+            overflow: auto;
+            border: 1px solid #3d3424;
+        }
+
+        .track-list button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            text-align: left;
+            border-width: 0 0 1px 0;
+            padding: 6px 10px;
+            box-sizing: border-box;
+        }
+
+        .track-list button:hover {
+            background: #2a2418;
+            color: white;
+        }
+
+        .track-list li.selected button,
+        .track-list li.selected button:hover {
+            background: rgb(197, 138, 51);
+            color: #111310;
+        }
+
+        .track-title {
+            flex: 1;
+            text-align: left;
+        }
+
+        .track-kind {
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
     </style>
 
 </head>
@@ -110,6 +201,16 @@
         <h1>Welcome To The LAN!</h1>
     </div>
     <br>
+
+    <div class="music-player">
+        <h2>Music</h2>
+        <p class="now-playing" id="now-playing">Loading music…</p>
+        <div class="music-controls">
+            <button type="button" id="music-start">Start</button>
+            <button type="button" id="music-stop">Stop</button>
+        </div>
+        <ul class="track-list" id="track-list"></ul>
+    </div>
 
     <!--Page nav end-->
 
@@ -245,6 +346,278 @@
             <font size="+1"> This page has been accessed <font color=red>1337</font> times.
         </b>
     </div>
+
+    <!-- MIDI playback uses WebAudio TinySynth (Apache-2.0), see js/webaudio-tinysynth.LICENSE -->
+    <script src="js/webaudio-tinysynth.min.js"></script>
+    <script>
+        (function () {
+            // Files in music/ are picked up when the server lists that folder.
+            // This list is used when directory listing is turned off.
+            var FALLBACK_TRACKS = [
+                "music/slayer_-_raining_blood.mid"
+            ];
+
+            var tracks = [];
+            var selected = -1;
+            var playing = false;
+            var playToken = 0;
+            var synth = null;
+            var midiTimer = null;
+            var audio = new Audio();
+            audio.preload = "auto";
+            audio.volume = 0.85;
+
+            var nowPlaying = document.getElementById("now-playing");
+            var listEl = document.getElementById("track-list");
+            var startBtn = document.getElementById("music-start");
+            var stopBtn = document.getElementById("music-stop");
+
+            function titleFromPath(src) {
+                var base = src.split("/").pop().replace(/\.(mp3|mid|midi)$/i, "");
+                var spaced = base.replace(/_+/g, " ").replace(/\s+/g, " ").trim();
+                return spaced.replace(/\b\w/g, function (ch) {
+                    return ch.toUpperCase();
+                });
+            }
+
+            function kindFromPath(src) {
+                return /\.mp3$/i.test(src) ? "mp3" : "midi";
+            }
+
+            function setStatus(text) {
+                nowPlaying.textContent = text;
+            }
+
+            function renderList() {
+                listEl.innerHTML = "";
+                tracks.forEach(function (track, i) {
+                    var li = document.createElement("li");
+                    if (i === selected) li.className = "selected";
+                    var btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.setAttribute("data-index", String(i));
+                    var title = document.createElement("span");
+                    title.className = "track-title";
+                    title.textContent = track.title;
+                    var kind = document.createElement("span");
+                    kind.className = "track-kind";
+                    kind.textContent = track.kind === "mp3" ? "MP3" : "MIDI";
+                    btn.appendChild(title);
+                    btn.appendChild(kind);
+                    li.appendChild(btn);
+                    listEl.appendChild(li);
+                });
+            }
+
+            function highlight() {
+                var items = listEl.children;
+                for (var i = 0; i < items.length; i++) {
+                    items[i].className = i === selected ? "selected" : "";
+                }
+            }
+
+            function haltSounds() {
+                if (midiTimer) {
+                    clearInterval(midiTimer);
+                    midiTimer = null;
+                }
+                audio.pause();
+                audio.removeAttribute("src");
+                audio.load();
+                if (synth) synth.stopMIDI();
+            }
+
+            function ensureSynth() {
+                if (!synth) {
+                    synth = new WebAudioTinySynth({ voices: 64, useReverb: 1, quality: 1 });
+                    synth.setMasterVol(0.45);
+                    synth.setLoop(0);
+                }
+                return synth;
+            }
+
+            function randomIndex(except) {
+                if (!tracks.length) return -1;
+                if (tracks.length === 1) return 0;
+                var next = except;
+                while (next === except) {
+                    next = Math.floor(Math.random() * tracks.length);
+                }
+                return next;
+            }
+
+            function failureText(err, title) {
+                if (err && err.name === "NotAllowedError") return "Click Start to play.";
+                if (location.protocol === "file:") return "Open this page through a web server to play music.";
+                return "Could not play " + title + ".";
+            }
+
+            function advance() {
+                if (!playing) return;
+                var next = randomIndex(selected);
+                if (next < 0) return;
+                startTrack(next);
+            }
+
+            audio.addEventListener("ended", advance);
+
+            function watchMidi(token, player) {
+                midiTimer = setInterval(function () {
+                    if (token !== playToken) return;
+                    var status = player.getPlayStatus();
+                    if (!status.play && status.maxTick > 0 && status.curTick >= status.maxTick) {
+                        clearInterval(midiTimer);
+                        midiTimer = null;
+                        advance();
+                    }
+                }, 250);
+            }
+
+            function startTrack(index) {
+                if (index < 0 || index >= tracks.length) return;
+                var token = ++playToken;
+                haltSounds();
+                selected = index;
+                playing = true;
+                highlight();
+                var track = tracks[index];
+                setStatus("Now playing: " + track.title);
+
+                if (track.kind === "mp3") {
+                    audio.src = track.src;
+                    var played = audio.play();
+                    if (played && played.then) {
+                        played.catch(function (err) {
+                            if (token !== playToken) return;
+                            playing = false;
+                            haltSounds();
+                            setStatus(failureText(err, track.title));
+                        });
+                    }
+                    return;
+                }
+
+                fetch(track.src)
+                    .then(function (res) {
+                        if (!res.ok) throw new Error("load");
+                        return res.arrayBuffer();
+                    })
+                    .then(function (buf) {
+                        if (token !== playToken) return;
+                        var bytes = new Uint8Array(buf);
+                        if (bytes.length < 4 || String.fromCharCode(bytes[0], bytes[1], bytes[2], bytes[3]) !== "MThd") {
+                            throw new Error("midi");
+                        }
+                        var player = ensureSynth();
+                        var ctx = player.getAudioContext();
+                        var resume = ctx.state === "suspended" ? ctx.resume() : Promise.resolve();
+                        return resume.then(function () {
+                            if (token !== playToken) return;
+                            if (ctx.state === "suspended") {
+                                var blocked = new Error("autoplay");
+                                blocked.name = "NotAllowedError";
+                                throw blocked;
+                            }
+                            player.setLoop(0);
+                            player.loadMIDI(buf);
+                            if (!player.getPlayStatus().maxTick) throw new Error("midi");
+                            player.playMIDI();
+                            watchMidi(token, player);
+                        });
+                    })
+                    .catch(function (err) {
+                        if (token !== playToken) return;
+                        playing = false;
+                        haltSounds();
+                        setStatus(failureText(err, track.title));
+                    });
+            }
+
+            function stopMusic() {
+                playToken++;
+                playing = false;
+                haltSounds();
+                if (selected >= 0 && tracks[selected]) setStatus("Stopped");
+            }
+
+            function tracksFromPaths(paths) {
+                var seen = {};
+                var out = [];
+                paths.forEach(function (src) {
+                    if (seen[src]) return;
+                    seen[src] = true;
+                    out.push({
+                        src: src,
+                        title: titleFromPath(src),
+                        kind: kindFromPath(src)
+                    });
+                });
+                out.sort(function (a, b) {
+                    return a.title.localeCompare(b.title);
+                });
+                return out;
+            }
+
+            function normalizeHref(href) {
+                href = href.split("#")[0].split("?")[0];
+                try {
+                    href = decodeURIComponent(href);
+                } catch (e) {}
+                if (/^(https?:)?\/\//i.test(href) || href.indexOf("..") !== -1) return null;
+                var parts = href.split("/").filter(Boolean);
+                var name = parts[parts.length - 1];
+                if (!name || !/\.(mp3|mid|midi)$/i.test(name)) return null;
+                return "music/" + name;
+            }
+
+            function discoverTracks() {
+                return fetch("music/").then(function (res) {
+                    if (!res.ok) return null;
+                    var type = res.headers.get("content-type") || "";
+                    if (type.indexOf("html") === -1 && type.indexOf("text") === -1 && type !== "") return null;
+                    return res.text();
+                }).then(function (html) {
+                    if (!html) return null;
+                    var found = [];
+                    var re = /href\s*=\s*["']([^"']+)["']/gi;
+                    var match;
+                    while ((match = re.exec(html))) {
+                        var src = normalizeHref(match[1]);
+                        if (src) found.push(src);
+                    }
+                    return found.length ? found : null;
+                }).catch(function () {
+                    return null;
+                });
+            }
+
+            startBtn.addEventListener("click", function () {
+                if (!tracks.length) return;
+                startTrack(selected >= 0 ? selected : randomIndex(-1));
+            });
+
+            stopBtn.addEventListener("click", stopMusic);
+
+            listEl.addEventListener("click", function (event) {
+                var target = event.target;
+                var btn = target.closest ? target.closest("button") : null;
+                if (!btn || !listEl.contains(btn)) return;
+                startTrack(Number(btn.getAttribute("data-index")));
+            });
+
+            discoverTracks().then(function (found) {
+                var paths = FALLBACK_TRACKS.slice();
+                if (found) paths = paths.concat(found);
+                tracks = tracksFromPaths(paths);
+                if (!tracks.length) {
+                    setStatus("No music files found.");
+                    return;
+                }
+                renderList();
+                startTrack(randomIndex(-1));
+            });
+        })();
+    </script>
 
 </body>
 
