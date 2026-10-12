@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lan</title>
+
+    <!--Display the date and time-->
+
+    <script language="JavaScript">
+
+        function displaydate() {
+            var strDate;
+            var i;
+
+            now = new Date();
+            strDate = now.toUTCString();
+
+            document.writeln("<center><table width=50% class=\"footerwhiteback\"><tr>");
+            for (i = 0; i <= strDate.length; i++) {
+                document.write("<td align=center><font face=\"Arial Narrow\" size=\"2\">");
+                document.write(strDate.charAt(i));
+                document.write("</td></font>");
+            }
+            document.writeln("</tr></table></center>");
+        }
+    </script>
+
+    <style>
+        @font-face {
+            font-family: Diablo;
+            src: url("fonts/AvQest.ttf");
+        }
+
+        .parallax {
+
+            background: url("images/side.gif") fixed;
+
+        }
+
+        body {
+            color: rgb(197, 138, 51);
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0px;
+            height: 190px;
+        }
+
+        table.game {
+            table-layout: fixed;
+            margin: 0px;
+            white-space: nowrap;
+            background-color: #111310;
+        }
+
+        td.game {
+            padding: 10px;
+            margin: 0px;
+        }
+
+        td.info {
+            padding: 10px;
+            margin: 0px;
+        }
+
+        td.title {
+            background-image: url(images/btntitle.gif);
+            background-size: 100%;
+            background-position-y: center;
+            background-repeat: no-repeat;
+            width: 350px;
+        }
+
+        h1 {
+            color: red;
+        }
+
+        h2 {
+            font-family: "Diablo", sans-serif;
+            color: white;
+        }
+
+        h4 {
+            color: white;
+        }
+
+        p.top {
+            margin: 0px;
+            height: 35px;
+        }
+    </style>
+
+</head>
+
+<body class="parallax">
+
+    <br>
+    <div align="center">
+        <!--Banner-->
+        <img src="images/diablobdr.gif" alt="banner">
+        <!--Display Time-->
+        <script language="JavaScript"> displaydate()</script>
+        <br>
+        <!--Text-->
+        <h1>Welcome To The LAN!</h1>
+    </div>
+    <br>
+
+    <!--Page nav end-->
+
+    <div align="center">
+        <table>
+            <td class="title" align="center">
+                <h2>Shooters</h2>
+            </td>
+        </table>
+    </div>
+
+    <p class="top" align="center"><img src="images/dframetop.gif"></p>
+
+    <div class="container">
+        <table class="game">
+            <img src="images/dframetopleft.gif" height="190px" width="35px">
+            <td class="game"><img src="images/boxcs.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>Counter-Strike</h4>
+                <div>Year: 2000</div>
+                <div>Players: 16</div>
+                <div>Genre: FPS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <table class="game">
+            <td class="game"><img src="images/boxtf2.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>Team Fortress</h4>
+                <div>Year: 2007</div>
+                <div>Players: 16</div>
+                <div>Genre: FPS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <img src="images/dframetopright.gif" height="190px" width="35px">
+
+    </div>
+    <div class="container">
+        <table class="game">
+            <img src="images/dframebottomleft.gif" height="190px" width="35px">
+            <td class="game"><img src="images/boxut.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>Unreal</h4>
+                <div>Year: 1998</div>
+                <div>Players: 16</div>
+                <div>Genre: FPS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <table class="game">
+            <td class="game"><img src="images/boxcod4.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>Call of Duty</h4>
+                <div>Year: 2007</div>
+                <div>Players: 16</div>
+                <div>Genre: FPS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <img src="images/dframebottomright.gif" height="190px" width="35px">
+    </div>
+
+    <p class="top" align="center"><img src="images/dframebottom.gif" width="604px"></p>
+
+    <br><br>
+
+    <div align="center">
+        <table>
+            <td class="title" align="center">
+                <h2>Real Time Strategy</h2>
+            </td>
+        </table>
+    </div>
+
+    <p class="top" align="center"><img src="images/dframetop.gif"></p>
+
+    <div class="container">
+        <table class="game">
+            <img src="images/dframetopleft.gif" height="190px" width="35px">
+            <td class="game"><img src="images/boxstarcraft.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>Starcraft</h4>
+                <div>Year: 1999</div>
+                <div>Players: 16</div>
+                <div>Genre: RTS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <table class="game">
+            <td class="game"><img src="images/boxwiii.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>Warcraft</h4>
+                <div>Year: 2002</div>
+                <div>Players: 16</div>
+                <div>Genre: FPS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <img src="images/dframetopright.gif" height="190px" width="35px">
+
+    </div>
+    <div class="container">
+        <table class="game">
+            <img src="images/dframebottomleft.gif" height="190px" width="35px">
+            <td class="game"><img src="images/boxraii.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>C&C</h4>
+                <div>Year: 2000</div>
+                <div>Players: 16</div>
+                <div>Genre: FPS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <table class="game">
+            <td class="game"><img src="images/boxaoeii.gif" width="100px"></td>
+            <td width="120px" class="info">
+                <h4>Age of Empires</h4>
+                <div>Year: 1999</div>
+                <div>Players: 16</div>
+                <div>Genre: FPS</div>
+                <div>&nbsp;</div>
+            </td>
+        </table>
+        <img src="images/dframebottomright.gif" height="190px" width="35px">
+    </div>
+
+    <p class="top" align="center"><img src="images/dframebottom.gif" width="604px"></p>
+
+    <br><br>
+    <div align=center>
+        <b>
+            <font size="+1"> This page has been accessed <font color=red>1337</font> times.
+        </b>
+    </div>
+
+</body>
+
+</html>
