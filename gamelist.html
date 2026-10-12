@@ -100,6 +100,10 @@
             margin: 8px auto 20px;
             padding: 8px 14px 14px;
             box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
 
         .music-player h2 {
@@ -114,8 +118,7 @@
             margin: 10px 0;
         }
 
-        .music-controls button,
-        .track-list button {
+        .music-controls button {
             font-family: "Arial Narrow", Arial, sans-serif;
             font-size: 16px;
             color: rgb(50, 200, 51);
@@ -133,45 +136,8 @@
             color: #111310;
         }
 
-        .track-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            max-height: 180px;
-            overflow: auto;
-            border: 1px solid #3d3424;
-        }
-
-        .track-list button {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            text-align: left;
-            border-width: 0 0 1px 0;
-            padding: 6px 10px;
-            box-sizing: border-box;
-        }
-
-        .track-list button:hover {
-            background: #2a2418;
-            color: white;
-        }
-
-        .track-list li.selected button,
-        .track-list li.selected button:hover {
-            background: rgb(30, 138, 51);
-            color: #111310;
-        }
-
-        .track-title {
-            flex: 1;
-            text-align: left;
-        }
-
-        .track-kind {
-            flex-shrink: 0;
-            margin-left: 12px;
+        .music-player .win98-select {
+            vertical-align: middle;
         }
 
         .game-downloads {
@@ -197,8 +163,7 @@
         }
 
         .game-downloads img {
-            width: 30px;
-            height: 30px;
+
             flex-shrink: 0;
         }
 
@@ -220,13 +185,6 @@
 
 <body class="parallax">
 
-    <select name="cars" id="cars">
-        <option value="volvo">Volvo</option>
-        <option value="saab">Saab</option>
-        <option value="opel">Opel</option>
-        <option value="audi">Audi</option>
-    </select>
-
     <br>
     <div align="center">
         <!--Banner-->
@@ -240,11 +198,11 @@
     <br>
 
     <div class="music-player">
-        <div class="music-controls" style="display: inline-block">
+        <div class="music-controls">
             <button type="button" id="music-start"><img src="/images/play.png" style="width: 50px" /></button>
             <button type=" button" id="music-stop"><img src="/images/stop.png" style="width: 50px" /></button>
         </div>
-        <ul class="track-list" id="track-list" style="display: inline-block"></ul>
+        <select class="track-list" id="track-list" aria-label="Tracks"></select>
     </div>
 
     <!--Page nav end-->
@@ -352,6 +310,7 @@
                 var listEl = document.getElementById("track-list");
                 var startBtn = document.getElementById("music-start");
                 var stopBtn = document.getElementById("music-stop");
+                var syncingSelect = false;
 
                 function titleFromPath(src) {
                     var base = src.split("/").pop().replace(/\.(mp3|mid|midi)$/i, "");
@@ -368,32 +327,28 @@
                 function setStatus(text) {
                 }
 
+                function optionLabel(track) {
+                    return track.title + " (" + (track.kind === "mp3" ? "MP3" : "MIDI") + ")";
+                }
+
                 function renderList() {
                     listEl.innerHTML = "";
                     tracks.forEach(function (track, i) {
-                        var li = document.createElement("li");
-                        if (i === selected) li.className = "selected";
-                        var btn = document.createElement("button");
-                        btn.type = "button";
-                        btn.setAttribute("data-index", String(i));
-                        var title = document.createElement("span");
-                        title.className = "track-title";
-                        title.textContent = track.title;
-                        var kind = document.createElement("span");
-                        kind.className = "track-kind";
-                        kind.textContent = track.kind === "mp3" ? "MP3" : "MIDI";
-                        btn.appendChild(title);
-                        btn.appendChild(kind);
-                        li.appendChild(btn);
-                        listEl.appendChild(li);
+                        var option = document.createElement("option");
+                        option.value = String(i);
+                        option.textContent = optionLabel(track);
+                        listEl.appendChild(option);
                     });
+                    if (selected >= 0 && selected < tracks.length) listEl.selectedIndex = selected;
                 }
 
                 function highlight() {
-                    var items = listEl.children;
-                    for (var i = 0; i < items.length; i++) {
-                        items[i].className = i === selected ? "selected" : "";
-                    }
+                    if (selected < 0 || selected >= listEl.options.length) return;
+                    if (listEl.selectedIndex === selected) return;
+                    syncingSelect = true;
+                    listEl.selectedIndex = selected;
+                    listEl.dispatchEvent(new Event("change", { bubbles: true }));
+                    syncingSelect = false;
                 }
 
                 function haltSounds() {
@@ -577,11 +532,9 @@
 
                 stopBtn.addEventListener("click", stopMusic);
 
-                listEl.addEventListener("click", function (event) {
-                    var target = event.target;
-                    var btn = target.closest ? target.closest("button") : null;
-                    if (!btn || !listEl.contains(btn)) return;
-                    startTrack(Number(btn.getAttribute("data-index")));
+                listEl.addEventListener("change", function () {
+                    if (syncingSelect) return;
+                    startTrack(Number(listEl.value));
                 });
 
                 discoverTracks().then(function (found) {
@@ -703,8 +656,6 @@
                     var img = document.createElement("img");
                     img.src = "/images/skull.gif";
                     img.alt = "";
-                    img.width = 30;
-                    img.height = 30;
                     var link = document.createElement("a");
                     link.href = "/games/" + encodeURIComponent(game.name);
                     link.setAttribute("download", game.name);

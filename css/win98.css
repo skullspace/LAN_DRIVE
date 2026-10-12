@@ -1,154 +1,145 @@
 /* Native control stays in the document for the value, but the OS menu cannot be skinned. */
 select.win98-native {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    clip-path: inset(50%);
-    border: 0;
-    white-space: nowrap;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
 }
 
 .win98-select {
-    position: relative;
-    display: inline-block;
-    vertical-align: middle;
-    font-family: Tahoma, "Microsoft Sans Serif", "MS Sans Serif", Arial, sans-serif;
-    font-size: 11px;
-    color: #000;
-    -webkit-font-smoothing: none;
-    user-select: none;
-    cursor: default;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  font-family: Tahoma, "Microsoft Sans Serif", "MS Sans Serif", Arial,
+    sans-serif;
+  font-size: 16px;
+  color: #000;
+  -webkit-font-smoothing: none;
+  user-select: none;
+  cursor: default;
 }
 
 .win98-select:focus {
-    outline: none;
+  outline: none;
 }
 
 .win98-select:focus-visible .win98-select-box {
-    outline: 1px dotted #000;
-    outline-offset: 2px;
+  outline: 1px dotted #000;
+  outline-offset: 2px;
 }
 
 .win98-select-box {
-    display: flex;
-    align-items: stretch;
-    box-sizing: border-box;
-    height: 21px;
-    padding: 2px;
-    background: #fff;
-    box-shadow:
-        inset -1px -1px #fff,
-        inset 1px 1px #808080,
-        inset -2px -2px #dfdfdf,
-        inset 2px 2px #000;
+  display: flex;
+  align-items: stretch;
+  box-sizing: border-box;
+  height: 21px;
+  padding: 2px;
+  background: #fff;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #808080,
+    inset -2px -2px #dfdfdf, inset 2px 2px #000;
 }
 
 .win98-select-value {
-    flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    min-width: 72px;
-    padding: 0 4px;
-    line-height: 15px;
-    white-space: nowrap;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  min-width: 72px;
+  padding: 0 4px;
+  line-height: 15px;
+  white-space: nowrap;
 }
 
 .win98-select-button {
-    flex: 0 0 16px;
-    width: 16px;
-    margin-left: 2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #c0c0c0;
-    box-shadow:
-        inset -1px -1px #0a0a0a,
-        inset 1px 1px #fff,
-        inset -2px -2px #808080,
-        inset 2px 2px #dfdfdf;
+  flex: 0 0 16px;
+  width: 16px;
+  margin-left: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #c0c0c0;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff,
+    inset -2px -2px #808080, inset 2px 2px #dfdfdf;
 }
 
 .win98-select.is-open .win98-select-button,
 .win98-select-button:active {
-    box-shadow:
-        inset -1px -1px #fff,
-        inset 1px 1px #0a0a0a,
-        inset -2px -2px #dfdfdf,
-        inset 2px 2px #808080;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a,
+    inset -2px -2px #dfdfdf, inset 2px 2px #808080;
 }
 
 .win98-select-arrow {
-    width: 7px;
-    height: 4px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' shape-rendering='crispEdges'%3E%3Crect width='7' height='1' fill='%23000'/%3E%3Crect x='1' y='1' width='5' height='1' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='1' fill='%23000'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23000'/%3E%3C/svg%3E") center / 7px 4px no-repeat;
+  width: 7px;
+  height: 4px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4' shape-rendering='crispEdges'%3E%3Crect width='7' height='1' fill='%23000'/%3E%3Crect x='1' y='1' width='5' height='1' fill='%23000'/%3E%3Crect x='2' y='2' width='3' height='1' fill='%23000'/%3E%3Crect x='3' y='3' width='1' height='1' fill='%23000'/%3E%3C/svg%3E")
+    center / 7px 4px no-repeat;
 }
 
 .win98-select.is-open .win98-select-arrow,
 .win98-select-button:active .win98-select-arrow {
-    transform: translate(1px, 1px);
+  transform: translate(1px, 1px);
 }
 
 .win98-select-list {
-    display: none;
-    position: absolute;
-    z-index: 1;
-    left: 0;
-    top: calc(100% + 1px);
-    box-sizing: border-box;
-    width: max-content;
-    min-width: 100%;
-    margin: 0;
-    padding: 2px;
-    list-style: none;
-    background: #fff;
-    box-shadow:
-        inset -1px -1px #fff,
-        inset 1px 1px #808080,
-        inset -2px -2px #dfdfdf,
-        inset 2px 2px #000;
+  display: none;
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: calc(100% + 1px);
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 100%;
+  margin: 0;
+  padding: 2px;
+  list-style: none;
+  background: #fff;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #808080,
+    inset -2px -2px #dfdfdf, inset 2px 2px #000;
 }
 
 .win98-select.is-open .win98-select-list {
-    display: block;
+  display: block;
 }
 
 .win98-select-option {
-    padding: 1px 4px 2px;
-    line-height: 15px;
-    white-space: nowrap;
+  padding: 1px 4px 2px;
+  line-height: 15px;
+  white-space: nowrap;
 }
 
 .win98-select-option.is-active {
-    background: #000080;
-    color: #fff;
+  background: #000080;
+  color: #fff;
 }
 
 .win98-select-option.is-disabled {
-    color: #808080;
+  color: #808080;
 }
 
 .win98-select-group {
-    padding: 2px 4px 1px;
-    color: #808080;
-    font-weight: bold;
-    line-height: 15px;
+  padding: 2px 4px 1px;
+  color: #808080;
+  font-weight: bold;
+  line-height: 15px;
 }
 
 .win98-select.is-open {
-    z-index: 2;
+  z-index: 2;
 }
 
 .win98-select.is-disabled {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 .win98-select.is-disabled .win98-select-value,
 .win98-select.is-disabled .win98-select-arrow {
-    color: #808080;
-    filter: grayscale(1);
-    opacity: 0.7;
+  color: #808080;
+  filter: grayscale(1);
+  opacity: 0.7;
 }
+
