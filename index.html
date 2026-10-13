@@ -550,7 +550,7 @@
 
                 discoverTracks().then(function (found) {
                     var paths = FALLBACK_TRACKS.slice();
-                    if (found) paths = paths.concat(found);
+                    if (found) paths = found;
                     tracks = tracksFromPaths(paths);
                     if (!tracks.length) {
                         setStatus("No music files found.");
