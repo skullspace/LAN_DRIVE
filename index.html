@@ -107,7 +107,7 @@
         }
 
         .music-player h2 {
-            margin: 4px 0 6px;
+            margin: 0px 0 6px;
             text-align: center;
         }
 
@@ -115,7 +115,7 @@
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin: 10px 0;
+            margin: 0px 0;
         }
 
         .music-controls button {
@@ -127,8 +127,9 @@
         }
 
         .music-controls button {
-            min-width: 88px;
-            padding: 4px 16px;
+            min-width: 0px;
+            max-height: 24px;
+            padding: 0px 0px;
         }
 
         .music-controls button:hover {
@@ -145,10 +146,11 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             column-gap: 24px;
-            width: 800px;
+            width: 775px;
             margin: 24px auto 20px;
             padding: 0;
             text-align: left;
+            background-color: #080808;
         }
 
         .game-downloads li {
@@ -158,12 +160,12 @@
             min-width: 0;
             padding: 6px 8px;
             border-bottom: 1px solid #3d3424;
-            font-family: "Arial Narrow", Arial, sans-serif;
-            font-size: 26px;
+            font-family: 'Times New Roman', g, serif, sans-serif;
+            font-size: 20px;
         }
 
         .game-downloads img {
-
+            min-height: 18px;
             flex-shrink: 0;
         }
 
@@ -173,8 +175,9 @@
         }
 
         .game-size {
-            color: white;
+            color: rgb(148, 148, 148);
             flex-shrink: 0;
+            font-size: 15px;
         }
     </style>
 
@@ -189,31 +192,21 @@
     <div align="center">
         <!--Banner-->
         <img src="images/diablobdr.gif" alt="banner">
-        <!--Display Time-->
-        <script language="JavaScript"> displaydate()</script>
         <br>
-        <!--Text-->
         <h1>Welcome To The LAN!</h1>
     </div>
-    <br>
-
     <div class="music-player">
         <div class="music-controls">
-            <button type="button" id="music-start"><img src="images/play.png" style="width: 50px" /></button>
-            <button type=" button" id="music-stop"><img src="images/stop.png" style="width: 50px" /></button>
+            <button type="button" id="music-start"><img src="images/play.png" style="width: 20px" /></button>
+            <button type=" button" id="music-stop"><img src="images/stop.png" style="width: 20px" /></button>
         </div>
         <select class="track-list" id="track-list" aria-label="Tracks"></select>
     </div>
+    <br>
+    <br>
+    <br>
 
     <!--Page nav end-->
-
-    <div align="center">
-        <table>
-            <td class="title" align="center">
-                <h2>Shooters</h2>
-            </td>
-        </table>
-    </div>
 
     <p class="top" align="center"><img src="images/dframetop.gif"></p>
 
@@ -230,12 +223,12 @@
             </td>
         </table>
         <table class="game">
-            <td class="game"><img src="images/boxtf2.gif" width="100px"></td>
+            <td class="game"><img src="images/boxstarcraft.gif" width="100px"></td>
             <td width="120px" class="info">
-                <h4>Team Fortress</h4>
-                <div>Year: 2007</div>
+                <h4>Starcraft</h4>
+                <div>Year: 1999</div>
                 <div>Players: 16</div>
-                <div>Genre: FPS</div>
+                <div>Genre: RTS</div>
                 <div>&nbsp;</div>
             </td>
         </table>
@@ -248,19 +241,19 @@
             <td class="game"><img src="images/boxut.gif" width="100px"></td>
             <td width="120px" class="info">
                 <h4>Unreal</h4>
-                <div>Year: 1998</div>
+                <div>Year: 1999</div>
                 <div>Players: 16</div>
                 <div>Genre: FPS</div>
                 <div>&nbsp;</div>
             </td>
         </table>
         <table class="game">
-            <td class="game"><img src="images/boxcod4.gif" width="100px"></td>
+            <td class="game"><img src="images/boxwiii.gif" width="100px"></td>
             <td width="120px" class="info">
-                <h4>Call of Duty</h4>
-                <div>Year: 2007</div>
+                <h4>Warcraft III</h4>
+                <div>Year: 2002</div>
                 <div>Players: 16</div>
-                <div>Genre: FPS</div>
+                <div>Genre: RTS</div>
                 <div>&nbsp;</div>
             </td>
         </table>
@@ -269,7 +262,7 @@
 
     <p class="top" align="center"><img src="images/dframebottom.gif" width="604px"></p>
 
-    <br><br>
+    <br><br><br><br><br><br>
 
     <div align="center">
         <table>
@@ -281,6 +274,10 @@
     <ul class="game-downloads" id="game-downloads"></ul>
 
     <br><br>
+    <div align="center">
+        <!--Banner-->
+        <img src="images/diibanner.gif" alt="banner">
+    </div>
     <div align=center>
         <b>
             <font size="+1"> This page has been accessed <font color=red>1337</font> times.
