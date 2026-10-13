@@ -6,6 +6,10 @@ Visit it here: https://lan-drive.nitrodist.workers.dev/
 
 Host it yourself at your next LAN party and/or the next Skullspace LAN party.
 
+## Reviews
+
+"Great project for hosting local games. The folder automation for uploading files and having them automatically populate the list saves a ton of time and makes the site convenient to update. The music player is a fun added touch, it made me laugh playing goofy MIDI files."
+
 ## How to deploy
 
 You will (probably, most likely) want to host this project with a webserver so that people can access it from your machine (or the Internet - we have hosted it at https://lan-drive.nitrodist.workers.dev/)
@@ -21,3 +25,4 @@ Add more zip files inside the games directory and the list of Downloads should r
 ### Development notes
 
 MIDI support through webaudio-tinysynth: https://github.com/g200kg/webaudio-tinysynth
+
